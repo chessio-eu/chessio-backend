@@ -6,15 +6,15 @@ use App\Enums\Color;
 use App\Events\PlayerJoiningGame;
 use App\Listeners\SetupPlayerColor;
 use App\Models\Player;
-use Illuminate\Foundation\Testing\WithoutEvents;
+use Event;
 use Tests\TestCase;
 
 class SetupPlayerColorTest extends TestCase
 {
-    use WithoutEvents;
-
     public function test_player_has_the_expected_color()
     {
+        Event::fake();
+
         $playerColorListener = $this->app->make(SetupPlayerColor::class);
 
         $player1 = Player::factory()->make(['color' => null]);
