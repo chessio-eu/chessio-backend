@@ -31,6 +31,6 @@ class PieceMoved implements ShouldBroadcast
 
     public function broadcastAs()
     {
-        return 'game.'.$this->piece->game->id.'.pieceMoved';
+        return "game.{$this->piece->game->id}.piece.{$this->piece->id}.moved";
     }
 }
