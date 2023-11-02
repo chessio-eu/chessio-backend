@@ -85,16 +85,16 @@ class Piece extends Model
         return $piece->exists();
     }
 
-    private function removeFromBoard() {
+    public function removeFromBoard() {
         $this->positionX = -1;
         $this->positionY = -1;
         $this->save();
+        PieceMoved::dispatch($this);
     }
 
     private function killEnemy(int $positionX, int $positionY) {
-        $enemyPiece = Piece::where('positionX', $positionX)->where('positionY', $positionY)
-            ->whereHas('player',
-                fn (Builder $playerQuery) => $playerQuery->where('id', $this->player->id));
+        $enemyPiece = Piece::query()->where('positionX', $positionX)->where('positionY', $positionY)->whereHas('player', fn ($player) => $player->whereNot('color', $this->player->color))
+            ->whereHas('game', fn($game) => $game->where('games.id', $this->game->id))->first();
         $enemyPiece->removeFromBoard();
     }
 
