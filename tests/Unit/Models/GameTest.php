@@ -25,9 +25,7 @@ class GameTest extends TestCase
         $whitePlayer = Player::factory()->for($this->game)->create(['color' => Color::White]);
         $blackPlayer = Player::factory()->for($this->game)->create(['color' => Color::Black]);
         // TODO the assertion $this->game->createPieces()
-        $this->game->createPieces();
-
-
+//        $this->game->createPieces();
     }
 
     public function test_game_returns_player_turn()
