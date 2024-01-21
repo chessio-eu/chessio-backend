@@ -1,6 +1,6 @@
 <?php
 
-namespace Unit\Listeners;
+namespace Tests\Unit\Listeners;
 
 use App\Events\KingIsThreatened;
 use App\Models\Piece;
