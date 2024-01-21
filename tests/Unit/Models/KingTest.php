@@ -3,7 +3,11 @@
 namespace Tests\Unit\Models;
 
 use App\Models\King;
+use App\Models\Knight;
+use App\Models\Piece;
+use App\Models\Queen;
 
+/** @property King $piece */
 class KingTest extends TestPieceCase
 {
     protected function setUp(): void
@@ -16,7 +20,8 @@ class KingTest extends TestPieceCase
         ]);
     }
 
-    private function moves(): array {
+    private function moves(): array
+    {
         return [
             [
                 $this->piece->positionX - 1,
@@ -43,7 +48,7 @@ class KingTest extends TestPieceCase
                 $this->piece->positionY + 1,
             ],
             [
-                $this->piece->positionX ,
+                $this->piece->positionX,
                 $this->piece->positionY + 1,
             ],
             [
@@ -74,7 +79,8 @@ class KingTest extends TestPieceCase
         $this->assertNotContains([$friendlyPositionX, $friendlyPositionY], $resultMoves);
     }
 
-    public function test_king_is_not_blocked_by_enemy_piece() {
+    public function test_king_is_not_blocked_by_enemy_piece()
+    {
         $enemyPositionX = 5;
         $enemyPositionY = 5;
         $friendlyPiece = $this->createEnemyPiece([
@@ -84,5 +90,108 @@ class KingTest extends TestPieceCase
         $resultMoves = $this->piece->availableMoves();
 
         $this->assertContains([$enemyPositionX, $enemyPositionY], $resultMoves);
+    }
+
+    /**
+     * @dataProvider providePiecesForThreatenedKing
+     */
+    public function test_king_is_threatened($enemyPieceBehindAtts, $enemyPieceInFrontAtts, $enemyPieceInFrontMove, $isKingTheatened)
+    {
+        $enemyPieceBehind = $this->createEnemyPiece([
+            'type' => $enemyPieceBehindAtts['type'],
+            'positionX' => $enemyPieceBehindAtts['positionX'],
+            'positionY' => $enemyPieceBehindAtts['positionY'],
+        ]);
+
+        $this->createEnemyPiece([
+            'type' => $enemyPieceInFrontAtts['type'],
+            'positionX' => $enemyPieceInFrontAtts['positionX'],
+            'positionY' => $enemyPieceInFrontAtts['positionY'],
+        ], $enemyPieceBehind->player);
+
+        $enemyPiece = Piece::where([
+            ['type', $enemyPieceInFrontAtts['type']],
+            ['positionX', $enemyPieceInFrontAtts['positionX']],
+            ['positionY', $enemyPieceInFrontAtts['positionY']],
+        ])->first();
+
+        $enemyPiece->move($enemyPieceInFrontMove['positionX'], $enemyPieceInFrontMove['positionY']);
+
+
+        $this->assertEquals($isKingTheatened, $this->piece->isThreatened());
+    }
+
+    public static function providePiecesForThreatenedKing()
+    {
+        return [
+            [
+                [
+                    'type' => 'pawn',
+                    'positionX' => 1,
+                    'positionY' => 1,
+                ],
+                [
+                    'type' => 'queen',
+                    'positionX' => 6,
+                    'positionY' => 3,
+                ],
+                [
+                    'positionX' => 4,
+                    'positionY' => 3,
+                ],
+                true
+            ],
+            [
+                [
+                    'type' => 'bishop',
+                    'positionX' => 6,
+                    'positionY' => 7,
+                ],
+                [
+                    'type' => 'knight',
+                    'positionX' => 5,
+                    'positionY' => 6,
+                ],
+                [
+                    'positionX' => 3,
+                    'positionY' => 5,
+                ],
+                true
+            ],
+            [
+                [
+                    'type' => 'rook',
+                    'positionX' => 4,
+                    'positionY' => 3,
+                ],
+                [
+                    'type' => 'bishop',
+                    'positionX' => 4,
+                    'positionY' => 4,
+                ],
+                [
+                    'positionX' => 3,
+                    'positionY' => 3,
+                ],
+                true
+            ],
+            [
+                [
+                    'type' => 'pawn',
+                    'positionX' => 1,
+                    'positionY' => 1,
+                ],
+                [
+                    'type' => 'queen',
+                    'positionX' => 4,
+                    'positionY' => 3,
+                ],
+                [
+                    'positionX' => 7,
+                    'positionY' => 3,
+                ],
+                false
+            ]
+        ];
     }
 }
