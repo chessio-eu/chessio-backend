@@ -10,4 +10,5 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class PawnFactory extends PieceFactory
 {
+    protected $type = 'pawn';
 }

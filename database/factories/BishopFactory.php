@@ -7,6 +7,5 @@ namespace Database\Factories;
  */
 class BishopFactory extends PieceFactory
 {
-
-    
+    protected $type = 'bishop';
 }
