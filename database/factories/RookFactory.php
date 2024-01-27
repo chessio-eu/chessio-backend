@@ -7,4 +7,5 @@ namespace Database\Factories;
  */
 class RookFactory extends PieceFactory
 {
+    protected $type = 'rook';
 }

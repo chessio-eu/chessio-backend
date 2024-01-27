@@ -9,4 +9,5 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class KingFactory extends PieceFactory
 {
+    protected $type = 'king';
 }

@@ -11,6 +11,17 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class PieceFactory extends Factory
 {
+    protected $type = null;
+
+    public function configure(): static
+    {
+        return $this->afterMaking(function ($piece) {
+            if ($this->type) {
+                $piece->type = $this->type;
+            }
+        });
+    }
+
     /**
      * Define the model's default state.
      *
