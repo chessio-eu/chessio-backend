@@ -23,5 +23,5 @@ Route::prefix('games')->group(function () {
 
 Route::prefix('pieces')->group(function () {
     Route::get('{piece}', [\App\Http\Controllers\PieceController::class, 'availableMoves']);
-    Route::post('{piece}', [\App\Http\Controllers\PieceController::class, 'move']);
+    Route::post('{piece}', [\App\Http\Controllers\PieceController::class, 'move'])->name('movePiece');
 });
