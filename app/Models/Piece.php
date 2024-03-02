@@ -41,7 +41,11 @@ class Piece extends Model
     }
 
     function moves() {
-        return $this->hasMany(Move::class);
+        return $this->hasMany(Move::class)->orderByDesc('id');
+    }
+
+    function previousMove(): Move | null {
+        return $this->moves()->skip(1)->first();
     }
 
     // Functions
@@ -73,7 +77,7 @@ class Piece extends Model
     }
 
     function someEnemyPositions($positions): bool {
-        $piece = Piece::query()->whereHas('player', fn ($player) => $player->whereNot('color', $this->player->color))
+        $piece = Piece::query()->whereHas('player', fn ($player) => $player->whereNot('color', $this->color))
             ->whereHas('game', fn($game) => $game->where('games.id', $this->game->id));
 
         $piece = $piece->where(function($query) use ($positions) {
@@ -93,13 +97,13 @@ class Piece extends Model
     }
 
     private function killEnemy(int $positionX, int $positionY) {
-        $enemyPiece = Piece::query()->where('positionX', $positionX)->where('positionY', $positionY)->whereHas('player', fn ($player) => $player->whereNot('color', $this->player->color))
+        $enemyPiece = Piece::query()->where('positionX', $positionX)->where('positionY', $positionY)->whereHas('player', fn ($player) => $player->whereNot('color', $this->color))
             ->whereHas('game', fn($game) => $game->where('games.id', $this->game->id))->first();
         $enemyPiece->removeFromBoard();
     }
 
     function getColorParamAttribute() {
-        return $this->player->color === Color::White ? 1 : -1;
+        return $this->color === Color::White ? 1 : -1;
     }
 
     function move(int $positionX, int $positionY) {

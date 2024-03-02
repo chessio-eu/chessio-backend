@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use App\Events\PieceMoved;
 use App\Events\PlayerJoinedGame;
 use App\Events\PlayerJoiningGame;
 use App\Events\SecondPlayerJoinedGame;
+use App\Listeners\CheckKingStatus;
 use App\Listeners\ProcessGame;
 use App\Listeners\SetupPlayerColor;
 use App\Models\Piece;
@@ -33,6 +35,9 @@ class EventServiceProvider extends ServiceProvider
         PlayerJoinedGame::class => [
             ProcessGame::class
         ],
+        PieceMoved::class => [
+            CheckKingStatus::class
+        ]
     ];
 
     /**

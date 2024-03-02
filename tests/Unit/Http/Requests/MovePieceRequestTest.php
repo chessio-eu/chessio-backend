@@ -3,17 +3,31 @@
 namespace Tests\Unit\Http\Requests;
 
 use App\Models\Bishop;
+use App\Models\Game;
+use App\Models\Player;
 use App\Support\CurrentPlayer\CurrentPlayer;
+use Database\Factories\PlayerFactory;
 use Tests\TestCase;
 
 class MovePieceRequestTest extends TestCase
 {
+    private function createGame()
+    {
+        $game = Game::factory()->create();
+        Player::factory()->for($game)->create();
+        Player::factory()->for($game)->create();
+
+        return $game;
+    }
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->piece = Bishop::factory()->createOne([
+        $game = $this->createGame();
+
+
+        $this->piece = Bishop::factory()->for($game->whitePlayer)->createOne([
             'positionX' => 4,
             'positionY' => 5,
         ]);

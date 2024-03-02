@@ -8,6 +8,7 @@ use App\Support\CurrentPlayer\CurrentPlayer;
 use Database\Factories\PlayerFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
+use Event;
 
 class CurrentPlayerTest extends TestCase
 {
@@ -28,6 +29,7 @@ class CurrentPlayerTest extends TestCase
     }
 
     function test_it_calls_adapter_set() {
+        Event::fake();
         $player = PlayerFactory::new()->create();
         $playerAdapterSpy = $this->spy(PlayerAdapter::class);
 

@@ -23,11 +23,15 @@ class Player extends Model
     }
 
     function moves(): HasManyThrough {
-        return $this->hasManyThrough(Move::class, Piece::class);
+        return $this->hasManyThrough(Move::class, Piece::class)->orderByDesc('id');
     }
 
     function game(): BelongsTo {
         return $this->belongsTo(Game::class);
+    }
+
+    function enemy(): static {
+        return $this->game->players()->whereNot('id', $this->id)->first();
     }
 
     function latestMove(): Move {
