@@ -93,9 +93,9 @@ class KingTest extends TestPieceCase
     }
 
     /**
-     * @dataProvider providePiecesForThreatenedKing
+     * @dataProvider providePiecesForCheckedKing
      */
-    public function test_king_is_threatened($enemyPieceBehindAtts, $enemyPieceInFrontAtts, $enemyPieceInFrontMove, $isKingTheatened)
+    public function test_king_is_checked($enemyPieceBehindAtts, $enemyPieceInFrontAtts, $enemyPieceInFrontMove, $isKingTheatened)
     {
         $enemyPieceBehind = $this->createEnemyPiece([
             'type' => $enemyPieceBehindAtts['type'],
@@ -118,10 +118,10 @@ class KingTest extends TestPieceCase
         $enemyPiece->move($enemyPieceInFrontMove['positionX'], $enemyPieceInFrontMove['positionY']);
 
 
-        $this->assertEquals($isKingTheatened, $this->piece->isThreatened());
+        $this->assertEquals($isKingTheatened, $this->piece->isChecked());
     }
 
-    public static function providePiecesForThreatenedKing()
+    public static function providePiecesForCheckedKing()
     {
         return [
             [

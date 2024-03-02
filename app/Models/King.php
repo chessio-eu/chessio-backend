@@ -31,7 +31,7 @@ class King extends Piece
         return $moves;
     }
 
-    private function isThreatenedByPiece(Piece $piece): bool {
+    private function isCheckedByPiece(Piece $piece): bool {
         $moves = $piece->availableMoves();
         foreach ($moves as $move) {
             if ($move[0] === $this->positionX && $move[1] === $this->positionY) {
@@ -54,16 +54,16 @@ class King extends Piece
         })->first();
     }
 
-    function isThreatened(): bool {
+    function isChecked(): bool {
         $piece = $this->player->enemy()->moves->first()->piece; //TODO: refactor this implementation
 
-        if ($this->isThreatenedByPiece($piece)) {
+        if ($this->isCheckedByPiece($piece)) {
             return true;
         }
 
         $previousMove = $piece->previousMove();
         $pieceOnSameAxis = $this->pieceOnSameAxis($previousMove->positionX, $previousMove->positionY);
-        if ($pieceOnSameAxis && $this->isThreatenedByPiece($pieceOnSameAxis)) {
+        if ($pieceOnSameAxis && $this->isCheckedByPiece($pieceOnSameAxis)) {
             return true;
         }
 

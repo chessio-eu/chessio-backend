@@ -2,7 +2,7 @@
 
 namespace App\Listeners;
 
-use App\Events\KingIsThreatened;
+use App\Events\KingIsChecked;
 use App\Events\PieceMoved;
 use App\Models\King;
 
@@ -12,8 +12,8 @@ class CheckKingStatus
     {
         $enemyKing = King::wherePlayerId($event->piece->player->enemy()->id)->first();
 
-        if ($enemyKing->isThreatened()) {
-            KingIsThreatened::dispatch($enemyKing);
+        if ($enemyKing->isChecked()) {
+            KingIsChecked::dispatch($enemyKing);
         }
     }
 }

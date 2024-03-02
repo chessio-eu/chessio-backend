@@ -6,7 +6,7 @@ use App\Models\King;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class KingIsThreatened
+class KingIsChecked
 {
     use Dispatchable, SerializesModels;
 
