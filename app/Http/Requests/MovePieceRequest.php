@@ -33,6 +33,9 @@ class MovePieceRequest extends FormRequest
                 if (!in_array([$this->request->get('positionX'), $this->request->get('positionY')], $this->piece->availableMoves())) {
                     $validator->errors()->add('position', 'Invalid move');
                 }
+                if ($this->piece->game->playerTurn()->id !== app(CurrentPlayer::class)->get()->id) {
+                    $validator->errors()->add('turn', 'Not player s turn');
+                }
             }
         ];
     }

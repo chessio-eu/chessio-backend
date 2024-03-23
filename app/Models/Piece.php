@@ -118,6 +118,11 @@ class Piece extends Model
             $this->killEnemy($positionX, $positionY);
         }
 
+        $move = new Move();
+        $move->positionX = $positionX;
+        $move->positionY = $positionY;
+        $this->moves()->save($move);
+
         $this->save();
         PieceMoved::dispatch($this);
     }

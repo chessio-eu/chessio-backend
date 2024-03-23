@@ -35,6 +35,6 @@ class Player extends Model
     }
 
     function latestMove(): Move {
-        // TODO
+        return $this->moves()->latest()->first();
     }
 }
