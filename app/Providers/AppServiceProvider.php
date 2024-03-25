@@ -2,8 +2,6 @@
 
 namespace App\Providers;
 
-use App\Models\Piece;
-use App\Observers\PieceObserver;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -25,6 +23,5 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Piece::observe(PieceObserver::class);
     }
 }

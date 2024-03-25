@@ -61,7 +61,6 @@ class PieceTest extends TestPieceCase
     public function test_piece_creates_move_on_create()
     {
         $piece = Piece::factory()->createOne();
-        $piece->createMoveIfNecessary();
 
         $this->movesContainPiece($piece);
     }
@@ -71,7 +70,6 @@ class PieceTest extends TestPieceCase
         $this->piece->positionX = rand(0, 7);
         $this->piece->positionY = rand(0, 7);
         $this->piece->save();
-        $this->piece->createMoveIfNecessary();
 
         $this->movesContainPiece($this->piece);
     }

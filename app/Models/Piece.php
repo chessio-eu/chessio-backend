@@ -122,16 +122,5 @@ class Piece extends Model
         PieceMoved::dispatch($this);
     }
 
-    function createMoveIfNecessary() {
-        $changes = $this->getChanges();
-        if ($this->wasRecentlyCreated || in_array('positionX', $changes) || in_array('positionY', $changes)) {
-            $move = new Move();
-            $move->positionX = $this->positionX;
-            $move->positionY = $this->positionY;
-
-            $this->moves()->save($move);
-        }
-    }
-
     function availableMoves(): array {return [];}
 }
