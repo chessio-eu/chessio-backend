@@ -11,7 +11,9 @@ use Tests\TestCase;
 
 class MovePieceRequestTest extends TestCase
 {
-    protected $game;
+    protected $whitePiece;
+    protected $blackPiece;
+
     private function createGame()
     {
         $game = Game::factory()->create();
@@ -25,22 +27,23 @@ class MovePieceRequestTest extends TestCase
     {
         parent::setUp();
 
-        $this->game = $this->createGame();
+        $game = $this->createGame();
 
-        $this->whitePiece = Bishop::factory()->for($this->game->whitePlayer)->createOne([
+        $this->whitePiece = Bishop::factory()->for($game->whitePlayer)->createOne([
             'positionX' => 4,
             'positionY' => 5,
         ]);
+
+        $this->blackPiece = Bishop::factory()->for($game->blackPlayer)->createOne([
+            'positionX' => 1,
+            'positionY' => 1,
+        ]);
+
     }
 
     /** @test */
     public function test_it_fails_with_an_invalid_move()
     {
-        $this->blackPiece = Bishop::factory()->for($this->game->blackPlayer)->createOne([
-            'positionX' => 1,
-            'positionY' => 1,
-        ]);
-
         $data = [
             'positionX' => 7,
             'positionY' => 1,
@@ -55,11 +58,6 @@ class MovePieceRequestTest extends TestCase
 
     public function test_it_passes_with_a_valid_move()
     {
-        $this->blackPiece = Bishop::factory()->for($this->game->blackPlayer)->createOne([
-            'positionX' => 1,
-            'positionY' => 1,
-        ]);
-
         $data = [
             'positionX' => 7,
             'positionY' => 2,
@@ -74,11 +72,6 @@ class MovePieceRequestTest extends TestCase
 
     public function test_it_is_player_s_turn()
     {
-        $this->blackPiece = Bishop::factory()->for($this->game->blackPlayer)->createOne([
-            'positionX' => 1,
-            'positionY' => 1,
-        ]);
-
         $data = [
             'positionX' => 7,
             'positionY' => 2,
@@ -105,14 +98,14 @@ class MovePieceRequestTest extends TestCase
     public function test_it_is_not_player_s_turn()
     {
         $data = [
-            'positionX' => 1,
+            'positionX' => 2,
             'positionY' => 2,
         ];
 
-        app(CurrentPlayer::class)->set($this->whitePiece->player);
+        app(CurrentPlayer::class)->set($this->blackPiece->player);
 
-        $response = $this->json('POST',route('movePiece', ['piece' => $this->whitePiece->id]), $data);
+        $response = $this->json('POST',route('movePiece', ['piece' => $this->blackPiece->id]), $data);
 
-        $this->assertEquals($response->json('message'), 'Not player s turn');
+        $this->assertEquals($response->json('message'), 'Not player\'s turn');
     }
 }
