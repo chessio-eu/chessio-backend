@@ -3,7 +3,7 @@
 namespace App\Support\CurrentPlayer\Providers;
 
 use App\Events\PlayerJoinedGame;
-use App\Support\CurrentPlayer\Adapters\SessionPlayer;
+use App\Support\CurrentPlayer\Adapters\CookiePlayer;
 use App\Support\CurrentPlayer\Contracts\PlayerAdapter;
 use App\Support\CurrentPlayer\CurrentPlayer;
 use App\Support\CurrentPlayer\Listeners\SetCurrentPlayer as SetCurrentPlayerListener;
@@ -19,7 +19,7 @@ class CurrentPlayerProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(PlayerAdapter::class, fn () => app(match (config('game.current_player.driver')) {
-            'session' => SessionPlayer::class
+            'cookie' => CookiePlayer::class
         }));
 
         $this->app->singleton(CurrentPlayer::class);

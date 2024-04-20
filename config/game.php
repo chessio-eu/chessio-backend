@@ -2,7 +2,7 @@
 
 return [
     'current_player' => [
-        'driver' => 'session',
+        'driver' => 'cookie',
         'cookie_name' => 'player_id'
     ]
 ];

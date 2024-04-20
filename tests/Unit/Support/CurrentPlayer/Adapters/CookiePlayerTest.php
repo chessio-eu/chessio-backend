@@ -2,13 +2,13 @@
 
 namespace Unit\Support\CurrentPlayer\Adapters;
 
-use App\Support\CurrentPlayer\Adapters\SessionPlayer;
+use App\Support\CurrentPlayer\Adapters\CookiePlayer;
 use Config;
 use Database\Factories\PlayerFactory;
 use Illuminate\Http\Request;
 use Tests\TestCase;
 
-class SessionPlayerTest extends TestCase {
+class CookiePlayerTest extends TestCase {
     function test_it_retrieves_player_from_cookie() {
         $cookieName = 'cookieName';
 
@@ -16,9 +16,9 @@ class SessionPlayerTest extends TestCase {
         $expectedPlayer = PlayerFactory::new()->create();
         $this->spy(Request::class)->shouldReceive('cookie')->with($cookieName)->andReturn($expectedPlayer->id);
 
-        $sessionPlayer = $this->app->make(SessionPlayer::class);
+        $cookiePlayer = $this->app->make(CookiePlayer::class);
 
-        $actualPlayer = $sessionPlayer->retrieve();
+        $actualPlayer = $cookiePlayer->retrieve();
         $this->assertEquals($expectedPlayer->id, $actualPlayer->id);
     }
 
@@ -27,8 +27,8 @@ class SessionPlayerTest extends TestCase {
 
         Config::set('game.current_player.cookie_name', $cookieName);
         $player = PlayerFactory::new()->create();
-        $sessionPlayer = $this->app->make(SessionPlayer::class);
-        $sessionPlayer->set($player);
+        $cookiePlayer = $this->app->make(CookiePlayer::class);
+        $cookiePlayer->set($player);
 
         $this->get('/')->assertCookie($cookieName, $player->id);
     }
