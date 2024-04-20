@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Support\CurrentPlayer\Providers;
 
-use App\Support\CurrentPlayer\Adapters\SessionPlayer;
+use App\Support\CurrentPlayer\Adapters\CookiePlayer;
 use App\Support\CurrentPlayer\Contracts\PlayerAdapter;
 use App\Support\CurrentPlayer\CurrentPlayer;
 use App\Support\CurrentPlayer\Providers\CurrentPlayerProvider;
@@ -20,13 +20,13 @@ class CurrentPlayerProviderTest extends TestCase
         $this->assertSame($intance1, $intance2);
     }
 
-    function test_it_binds_session_player_to_http_player() {
+    function test_it_binds_cookie_player_to_http_player() {
         $provider = new CurrentPlayerProvider($this->app);
 
-        \Config::set('game.current_player.driver', 'session');
+        \Config::set('game.current_player.driver', 'cookie');
 
         $provider->register();
 
-        $this->assertInstanceOf(SessionPlayer::class, $this->app->make(PlayerAdapter::class));
+        $this->assertInstanceOf(CookiePlayer::class, $this->app->make(PlayerAdapter::class));
     }
 }

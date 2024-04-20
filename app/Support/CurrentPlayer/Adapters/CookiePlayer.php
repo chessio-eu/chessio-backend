@@ -7,7 +7,7 @@ use App\Support\CurrentPlayer\Contracts\PlayerAdapter;
 use Cookie;
 use Illuminate\Http\Request;
 
-class SessionPlayer implements PlayerAdapter {
+class CookiePlayer implements PlayerAdapter {
     private string $cookieName;
     private Request $request;
 
