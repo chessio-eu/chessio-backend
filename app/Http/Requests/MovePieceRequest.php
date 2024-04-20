@@ -30,6 +30,10 @@ class MovePieceRequest extends FormRequest
     public function after(): array {
         return [
             function (Validator $validator) {
+                if ($this->piece->game->playerTurn()->id !== $this->piece->player->id) {
+                    $validator->errors()->add('turn', 'Not player\'s turn');
+                    return;
+                }
                 if (!in_array([$this->request->get('positionX'), $this->request->get('positionY')], $this->piece->availableMoves())) {
                     $validator->errors()->add('position', 'Invalid move');
                 }
