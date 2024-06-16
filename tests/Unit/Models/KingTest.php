@@ -2,9 +2,10 @@
 
 namespace Tests\Unit\Models;
 
+use App\Enums\Color;
 use App\Models\King;
-use App\Models\Knight;
 use App\Models\Piece;
+use App\Models\Player;
 use App\Models\Queen;
 
 /** @property King $piece */
@@ -60,6 +61,8 @@ class KingTest extends TestPieceCase
 
     public function test_king_can_move_everywhere_around_him()
     {
+        Player::factory()
+            ->createOne(['color' => Color::Black, 'game_id' => $this->piece->game->id]);
         $expectedMoves = $this->moves();
         $availableMoves = $this->piece->availableMoves();
 
@@ -68,28 +71,40 @@ class KingTest extends TestPieceCase
 
     public function test_king_is_blocked_by_friendly_piece()
     {
-        $friendlyPositionX = $this->piece->positionX + 1;
-        $friendlyPositionY = $this->piece->positionY;
+        Player::factory()
+            ->createOne(['color' => Color::Black, 'game_id' => $this->piece->game->id]);
         $friendlyPiece = $this->createFriendlyPiece([
-            'positionX' => $friendlyPositionX,
-            'positionY' => $friendlyPositionY
+            'positionX' => $this->piece->positionX + 1,
+            'positionY' => $this->piece->positionY
         ]);
         $resultMoves = $this->piece->availableMoves();
 
-        $this->assertNotContains([$friendlyPositionX, $friendlyPositionY], $resultMoves);
+        $this->assertNotContains([$friendlyPiece->positionX, $friendlyPiece->positionY], $resultMoves);
     }
 
     public function test_king_is_not_blocked_by_enemy_piece()
     {
-        $enemyPositionX = 5;
-        $enemyPositionY = 5;
-        $friendlyPiece = $this->createEnemyPiece([
-            'positionX' => $enemyPositionX,
-            'positionY' => $enemyPositionY
+        $enemy = $this->createEnemyPiece([
+            'positionX' => 5,
+            'positionY' => 5
         ]);
         $resultMoves = $this->piece->availableMoves();
 
-        $this->assertContains([$enemyPositionX, $enemyPositionY], $resultMoves);
+        $this->assertContains([$enemy->positionX, $enemy->positionY], $resultMoves);
+    }
+
+    public function test_king_cant_move_to_enemy_available_move()
+    {
+        $friendlyPiece = $this->createEnemyPiece([
+            'positionX' => 5,
+            'positionY' => 7,
+            'type' => Queen::class
+        ]);
+        $resultMoves = $this->piece->availableMoves();
+
+        $this->assertNotContains([5, 5], $resultMoves);
+        $this->assertNotContains([5, 6], $resultMoves);
+        $this->assertNotContains([5, 4], $resultMoves);
     }
 
     /**
@@ -139,7 +154,14 @@ class KingTest extends TestPieceCase
                     'positionX' => 4,
                     'positionY' => 3,
                 ],
-                true
+                true,
+                [
+                    [
+                        'type' => 'queen',
+                        'positionX' => 4,
+                        'positionY' => 3,
+                    ],
+                ]
             ],
             [
                 [
@@ -156,7 +178,14 @@ class KingTest extends TestPieceCase
                     'positionX' => 3,
                     'positionY' => 5,
                 ],
-                true
+                true,
+                [
+                    [
+                        'type' => 'bishop',
+                        'positionX' => 6,
+                        'positionY' => 7,
+                    ],
+                ]
             ],
             [
                 [
@@ -173,7 +202,14 @@ class KingTest extends TestPieceCase
                     'positionX' => 3,
                     'positionY' => 3,
                 ],
-                true
+                true,
+                [
+                    [
+                        'type' => 'rook',
+                        'positionX' => 4,
+                        'positionY' => 3,
+                    ],
+                ]
             ],
             [
                 [
@@ -190,8 +226,78 @@ class KingTest extends TestPieceCase
                     'positionX' => 7,
                     'positionY' => 3,
                 ],
-                false
-            ]
+                false,
+                []
+            ],
+            [
+                [
+                    'type' => 'bishop',
+                    'positionX' => 2,
+                    'positionY' => 3,
+                ],
+                [
+                    'type' => 'knight',
+                    'positionX' => 3,
+                    'positionY' => 4,
+                ],
+                [
+                    'positionX' => 2,
+                    'positionY' => 6,
+                ],
+                true,
+                [
+                    [
+                        'type' => 'bishop',
+                        'positionX' => 2,
+                        'positionY' => 3,
+                    ],
+                    [
+                        'type' => 'knight',
+                        'positionX' => 2,
+                        'positionY' => 6,
+                    ]
+                ]
+            ],
         ];
+    }
+
+    /**
+     * @dataProvider providePiecesForCheckedKing
+     */
+    public function test_king_is_checked_by_pieces($enemyPieceBehindAtts, $enemyPieceInFrontAtts, $enemyPieceInFrontMove, $isKingTheatened, $checkingPieces)
+    {
+        $enemyPieceBehind = $this->createEnemyPiece([
+            'type' => $enemyPieceBehindAtts['type'],
+            'positionX' => $enemyPieceBehindAtts['positionX'],
+            'positionY' => $enemyPieceBehindAtts['positionY'],
+        ]);
+
+        $this->createEnemyPiece([
+            'type' => $enemyPieceInFrontAtts['type'],
+            'positionX' => $enemyPieceInFrontAtts['positionX'],
+            'positionY' => $enemyPieceInFrontAtts['positionY'],
+        ], $enemyPieceBehind->player);
+
+        $enemyPiece = Piece::where([
+            ['type', $enemyPieceInFrontAtts['type']],
+            ['positionX', $enemyPieceInFrontAtts['positionX']],
+            ['positionY', $enemyPieceInFrontAtts['positionY']],
+        ])->first();
+
+        $enemyPiece->move($enemyPieceInFrontMove['positionX'], $enemyPieceInFrontMove['positionY']);
+
+
+        foreach ($checkingPieces as $checkingPieceData) {
+            $checkingPiece = Piece::where([
+                ['type', $checkingPieceData['type']],
+                ['positionX', $checkingPieceData['positionX']],
+                ['positionY', $checkingPieceData['positionY']],
+            ])->first();
+            $this->assertTrue($this->piece->checkingPieces()->contains(fn(Piece $piece) => $piece->id === $checkingPiece->id));
+        }
+
+        if (count($checkingPieces) === 0) {
+            $this->assertTrue($this->piece->checkingPieces()->isEmpty());
+        }
     }
 }

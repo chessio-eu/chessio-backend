@@ -2,11 +2,10 @@
 
 namespace App\Providers;
 
-use App\Events\PieceMoved;
 use App\Events\PlayerJoinedGame;
 use App\Events\PlayerJoiningGame;
-use App\Events\SecondPlayerJoinedGame;
-use App\Listeners\CheckKingStatus;
+use App\Events\PlayerTurnEnds;
+use App\Listeners\DetermineGameStatus;
 use App\Listeners\ProcessGame;
 use App\Listeners\SetupPlayerColor;
 use App\Models\Piece;
@@ -16,7 +15,6 @@ use App\Observers\PlayerObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -35,8 +33,8 @@ class EventServiceProvider extends ServiceProvider
         PlayerJoinedGame::class => [
             ProcessGame::class
         ],
-        PieceMoved::class => [
-            CheckKingStatus::class
+        PlayerTurnEnds::class => [
+            DetermineGameStatus::class
         ]
     ];
 

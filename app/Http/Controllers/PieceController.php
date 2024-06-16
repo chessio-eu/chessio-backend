@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\PlayerTurnEnds;
 use App\Http\Requests\MovePieceRequest;
 use App\Models\Piece;
-use Illuminate\Http\Request;
 
 class PieceController extends Controller
 {
     public function move(MovePieceRequest $request, Piece $piece) {
         $piece->move($request->positionX, $request->positionY);
+
+        PlayerTurnEnds::dispatch($piece->player);
 
         return $piece;
     }
