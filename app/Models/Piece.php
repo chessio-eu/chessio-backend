@@ -107,7 +107,7 @@ class Piece extends Model
     }
 
     function move(int $positionX, int $positionY) {
-        if (!in_array([$positionX, $positionY], $this->availableMoves())) {
+        if (!$this->canMoveTo($positionX, $positionY)) {
             throw new \Error('Invalid move');
         }
 
@@ -123,4 +123,85 @@ class Piece extends Model
     }
 
     function availableMoves(): array {return [];}
+
+    function canMoveTo(int $positionX, int $positionY): bool {
+        return in_array([$positionX, $positionY], $this->availableMoves());
+    }
+
+    /**
+     * @param array{int, int}[] $positions
+     */
+    function canMoveToAny(array $positions): bool {
+        foreach ($positions as $position) {
+            if ($this->canMoveTo($position[0], $position[1])) {
+                return true;
+            }
+        }
+       return false;
+    }
+
+    /**
+     * @param array{x: int, y: int} $positionA
+     * @param array{x: int, y: int} $positionB
+     * @param array{x: int, y: int} $positionC
+     */
+    protected function onSameLine(array $positionA, array $positionB, array $positionC): bool {
+        if ($positionA['x'] === $positionB['x']) {
+            if ($positionC['x'] === $positionB['x']) {
+                return true;
+            }
+
+            return false;
+        }
+
+        $onSameLine = fn (): bool => $positionC['y'] === (($positionB["y"] - $positionA['y']) / ($positionB["x"] - $positionA['x']) * ($positionC['x'] - $positionA["x"]) + $positionA["y"]);
+
+        if ($onSameLine()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     *  @return array{int, int}[] $positions
+     */
+    protected function generatePositionsInLine(int $fromPositionX, int $fromPositionY, int $toPositionX, int $toPositionY): array {
+        $moves = [];
+
+        $minX = min($fromPositionX, $toPositionX);
+        $maxX = max($fromPositionX, $toPositionX);
+        $minY = min($fromPositionY, $toPositionY);
+        $maxY = max($fromPositionY, $toPositionY);
+
+        for ($x = $minX; $x <= $maxX; $x++) {
+            for ($y = $minY; $y <= $maxY; $y++) {
+                if ($this->onSameLine(['x' => $fromPositionX, 'y' => $fromPositionY], ['x' => $toPositionX, 'y' => $toPositionY], ['x' => $x, 'y' => $y])) {
+                    $moves[] = [$x, $y];
+                }
+            }
+        }
+
+        return $moves;
+    }
+
+    function canPreventPieceToMoveAt(Piece $attackingPiece, int $positionX, int $positionY): bool {
+        if ($this->canMoveTo($attackingPiece->positionX, $attackingPiece->positionY)) {
+            return true;
+        }
+
+        if ($attackingPiece->type === $this->classToAlias(Knight::class)) {
+            return false;
+        }
+
+        $positions = $this->generatePositionsInLine($attackingPiece->positionX, $attackingPiece->positionY, $positionX, $positionY);
+        $positions = array_filter($positions, function (array $position) use ($positionX, $positionY) {
+            return $position !== [$positionX, $positionY];
+        });
+        if ($this->canMoveToAny($positions)) {
+            return true;
+        }
+
+        return false;
+    }
 }

@@ -3,6 +3,7 @@
 namespace Tests\Unit\Listeners;
 
 use App\Events\KingIsChecked;
+use App\Events\PlayerTurnEnds;
 use App\Models\Piece;
 use App\Models\Player;
 use App\Models\Rook;
@@ -22,6 +23,7 @@ class CheckKingStatusTest extends TestCase
         Event::fake([KingIsChecked::class]);
 
         $enemy->move(1, 3);
+        PlayerTurnEnds::dispatch($enemy->player);
         Event::assertDispatched(KingIsChecked::class);
     }
 
@@ -36,6 +38,7 @@ class CheckKingStatusTest extends TestCase
         Event::fake([KingIsChecked::class]);
 
         $enemy->move(2, 3);
+        PlayerTurnEnds::dispatch($enemy->player);
         Event::assertNotDispatched(KingIsChecked::class);
     }
 }

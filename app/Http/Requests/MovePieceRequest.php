@@ -2,10 +2,14 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Piece;
 use App\Support\CurrentPlayer\CurrentPlayer;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
 
+/**
+ * @property Piece $piece
+ */
 class MovePieceRequest extends FormRequest
 {
     /**
@@ -34,7 +38,8 @@ class MovePieceRequest extends FormRequest
                     $validator->errors()->add('turn', 'Not player\'s turn');
                     return;
                 }
-                if (!in_array([$this->request->get('positionX'), $this->request->get('positionY')], $this->piece->availableMoves())) {
+
+                if (!$this->piece->canMoveTo($this->input('positionX'), $this->input('positionY'))) {
                     $validator->errors()->add('position', 'Invalid move');
                 }
             }
